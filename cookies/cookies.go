@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+// Cookie stores a quote and a category for that quote.
 type Cookie struct {
 	Category string
 	Content  string
@@ -19,15 +20,19 @@ func (c *Cookie) String() string {
 	return fmt.Sprintf("%s: %s", c.Category, c.Content)
 }
 
+// Service provides access to cookies on a random or categorized basis.
 type Service struct {
 	Rng     *rand.Rand
 	Cookies []Cookie
 }
 
+// Error is returned in the event that this library experiences a failure.
 type Error struct {
 	Error string
 }
 
+// New creates a new cookies service based on a directory and a random number
+// generator.
 func New(dir string, rng *rand.Rand) (Service, *Error) {
 	files, err := filepath.Glob(fmt.Sprintf("%s/*.txt", dir))
 	if err != nil {
@@ -35,7 +40,7 @@ func New(dir string, rng *rand.Rand) (Service, *Error) {
 		return Service{}, &Error{fmt.Sprintf("Unable to read directory: %s", dir)}
 	}
 
-	cookies := make([]Cookie, 0)
+	var cookies []Cookie
 	for _, file := range files {
 		info, err1 := os.Stat(file)
 		category := strings.Replace(info.Name(), ".txt", "", 1)
@@ -52,15 +57,20 @@ func New(dir string, rng *rand.Rand) (Service, *Error) {
 		}
 	}
 
+	fmt.Printf("%v cookies loaded\n", len(cookies))
 	return Service{rng, cookies}, nil
 }
 
+// GetCookie returns a random cookie.
 func (s *Service) GetCookie() Cookie {
 	return s.Cookies[s.Rng.Intn(len(s.Cookies))]
 }
 
+// ByCategory returns a random cookie from the category provided or an Error
+// value instead, in the event that the category requested has no quotes
+// available.
 func (s *Service) ByCategory(category string) (Cookie, *Error) {
-	cookies := make([]Cookie, 0)
+	var cookies []Cookie
 	for idx := range s.Cookies {
 		if category == s.Cookies[idx].Category {
 			cookies = append(cookies, s.Cookies[idx])
