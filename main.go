@@ -26,7 +26,6 @@ func main() {
 	}
 
 	var getCookie = func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("getting cookie")
 		cookie, err := json.Marshal(service.GetCookie())
 		if err != nil {
 			fmt.Fprint(w, err)
@@ -36,7 +35,6 @@ func main() {
 	}
 
 	var getCookieWithCategory = func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("getting cookie by category")
 		cookie, err := service.ByCategory(mux.Vars(r)["category"])
 		if err != nil {
 			fmt.Fprint(w, err)
