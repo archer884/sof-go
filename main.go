@@ -12,6 +12,11 @@ import (
 	"github.com/gorilla/mux"
 )
 
+type cookieResponse struct {
+	Timestamp time.Time
+	Cookie    *cookies.Cookie
+}
+
 func main() {
 	args := os.Args[1:]
 	if len(args) < 1 {
@@ -26,11 +31,13 @@ func main() {
 	}
 
 	var getCookie = func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := json.Marshal(service.GetCookie())
+		cookie := service.GetCookie()
+		response := cookieResponse{time.Now().UTC(), &cookie}
+		encoded, err := json.Marshal(response)
 		if err != nil {
 			fmt.Fprint(w, err)
 		} else {
-			fmt.Fprint(w, string(cookie))
+			fmt.Fprint(w, string(encoded))
 		}
 	}
 
@@ -41,7 +48,8 @@ func main() {
 			return
 		}
 
-		encoded, encErr := json.Marshal(cookie)
+		response := cookieResponse{time.Now().UTC(), &cookie}
+		encoded, encErr := json.Marshal(response)
 		if err != nil {
 			fmt.Fprint(w, encErr)
 		} else {

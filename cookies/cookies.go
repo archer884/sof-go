@@ -55,8 +55,8 @@ func New(dir string, rng *rand.Rand) (Service, *Error) {
 	return Service{rng, cookies}, nil
 }
 
-func (s *Service) GetCookie() *Cookie {
-	return &s.Cookies[s.Rng.Intn(len(s.Cookies))]
+func (s *Service) GetCookie() Cookie {
+	return s.Cookies[s.Rng.Intn(len(s.Cookies))]
 }
 
 func (s *Service) ByCategory(category string) (Cookie, *Error) {
